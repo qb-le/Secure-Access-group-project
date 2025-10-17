@@ -1,44 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 
-namespace DAL.Models;
-
-[Table("Employee")]
-public partial class Employee
+namespace DAL.Models
 {
-    [Key]
-    [Column("employee_id")]
-    public int EmployeeId { get; set; }
+    public class Employee
+    {
+        [Key]
+        public int EmployeeId { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? PasswordHash { get; set; }
+        public int? RoleId { get; set; }
+        public int? LocationId { get; set; }
 
-    [Column("name")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? Name { get; set; }
-
-    [Column("email")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? Email { get; set; }
-
-    [Column("password_hash")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? PasswordHash { get; set; }
-
-    [Column("role_id")]
-    public int? RoleId { get; set; }
-
-    [Column("location_id")]
-    public int? LocationId { get; set; }
-
-    [ForeignKey("LocationId")]
-    [InverseProperty("Employees")]
-    public virtual Location? Location { get; set; }
-
-    [ForeignKey("RoleId")]
-    [InverseProperty("Employees")]
-    public virtual Role? Role { get; set; }
+        public virtual Role? Role { get; set; }
+        public virtual Location? Location { get; set; }
+    }
 }

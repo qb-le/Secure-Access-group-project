@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "QR Login";
+}
+
+<h2>Scan this QR code with your phone</h2>
+
+<img src="@Url.Action("GenerateQRCode", "QR", new { token = ViewBag.QRToken })" />
+
+<script>
+    const token = '@ViewBag.QRToken';
+
+    setInterval(async () => {
+        const response = await fetch(`/QR/CheckScan?token=${token}`);
+        const data = await response.json();
+        if(data.scanned){
+            window.location.href = '/Account/Login'; // redirect PC to login
+        }
+    }, 2000);
+</script>

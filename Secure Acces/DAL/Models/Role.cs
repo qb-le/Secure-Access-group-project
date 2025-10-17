@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Models;
-
-[Table("Role")]
-public partial class Role
+namespace DAL.Models
 {
-    [Key]
-    [Column("role_id")]
-    public int RoleId { get; set; }
+    public class Role
+    {
+        [Key]
+        public int RoleId { get; set; }
+        public string? Name { get; set; }
 
-    [Column("name")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? Name { get; set; }
-
-    [InverseProperty("Role")]
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    }
 }

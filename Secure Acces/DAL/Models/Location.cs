@@ -1,29 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Models;
-
-[Table("Location")]
-public partial class Location
+namespace DAL.Models
 {
-    [Key]
-    [Column("location")]
-    public int Location1 { get; set; }
+    public class Location
+    {
+        [Key]
+        public int LocationId { get; set; }
+        public string? Coordinates { get; set; }
 
-    [Column("coordinates")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? Coordinates { get; set; }
-
-    [InverseProperty("Location")]
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
-
-    [InverseProperty("Location")]
-    public virtual ICollection<Door> Doors { get; set; } = new List<Door>();
-
-    [InverseProperty("Location")]
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public virtual ICollection<Door> Doors { get; set; } = new List<Door>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    }
 }

@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Models;
-
-[Table("Access_Method")]
-public partial class AccessMethod
+namespace DAL.Models
 {
-    [Key]
-    [Column("access_method_id")]
-    public int AccessMethodId { get; set; }
+    public class AccessMethod
+    {
+        [Key]
+        public int AccessMethodId { get; set; }
+        public string? Name { get; set; }
 
-    [Column("name")]
-    [StringLength(1)]
-    [Unicode(false)]
-    public string? Name { get; set; }
-
-    [InverseProperty("AccessMethod")]
-    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+    }
 }

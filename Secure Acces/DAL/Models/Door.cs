@@ -1,25 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DAL.Models;
-
-[Table("Door")]
-public partial class Door
+namespace DAL.Models
 {
-    [Key]
-    [Column("door_id")]
-    public int DoorId { get; set; }
+    public class Door
+    {
+        [Key]
+        public int DoorId { get; set; }
+        public double? Number { get; set; }
+        public int? LocationId { get; set; }
 
-    [Column("number")]
-    public double? Number { get; set; }
-
-    [Column("location_id")]
-    public int? LocationId { get; set; }
-
-    [ForeignKey("LocationId")]
-    [InverseProperty("Doors")]
-    public virtual Location? Location { get; set; }
+        public virtual Location? Location { get; set; }
+    }
 }
