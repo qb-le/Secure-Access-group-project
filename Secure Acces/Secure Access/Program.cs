@@ -1,13 +1,9 @@
-using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Register ApplicationDbContext with EF Core
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add MVC services
 builder.Services.AddControllersWithViews();
