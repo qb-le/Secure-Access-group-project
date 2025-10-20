@@ -15,32 +15,33 @@ namespace DAL
             _connectionString = connectionString;
         }
 
-        public List<DtoUser> GetAllUsers()
+public List<DtoUser> GetAllUsers()
+{
+    var users = new List<DtoUser>();
+
+    using (SqlConnection conn = new SqlConnection(_connectionString))
+    {
+        conn.Open();
+
+        string query = "SELECT userId, Name FROM [user]"; 
+        using (SqlCommand cmd = new SqlCommand(query, conn))
         {
-            var users = new List<DtoUser>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlDataReader reader = cmd.ExecuteReader())
             {
-                conn.Open();
-
-                string query = "SELECT Id, Name FROM user";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                while (reader.Read())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    users.Add(new DtoUser
                     {
-                        while (reader.Read())
-                        {
-                            users.Add(new DtoUser
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
-                            });
-                        }
-                    }
+                        Id = reader.GetInt32(reader.GetOrdinal("userId")),
+                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                    });
                 }
             }
-
-            return users;
         }
+    }
+
+    return users;
+}
+
     }
 }

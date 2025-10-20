@@ -1,10 +1,11 @@
-using Microsoft.EntityFrameworkCore;
 using DAL;
-using Logic.Interface;
-using Logic.Services;
 using DAL.Interfaces;
 using DAL.repository;
+using Logic.Interface;
 using Logic.Service;
+using Logic.Services;
+using Microsoft.EntityFrameworkCore;
+using Secure_Access.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IUserRepository>(provider => new UserRepository(conne
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IDoorRepository>(provider => new DoorRepository(connectionString));
 builder.Services.AddScoped<IDoorService, DoorService>();
+builder.Services.AddSingleton<QRTokenManager>();
 
 
 // Add MVC services
@@ -38,6 +40,7 @@ app.UseAuthorization();
 // Default route
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
+
 
 app.Run();
