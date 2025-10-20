@@ -1,6 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Logic.Dto;
 using Logic.Interface;
 

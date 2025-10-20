@@ -1,26 +1,18 @@
 ﻿using Logic.Dto;
-using DAL;
+using Logic.Interface;
 
 namespace Logic.Services
 {
     public class UserService
     {
-        private readonly UserRepository _userRepository;
-
-        public UserService(string connectionString)
+        private readonly IUserRepository _userRepository;
+        
+        public UserService(IUserRepository userRepository)
         {
-            _userRepository = new UserRepository(connectionString);
+            _userRepository = userRepository;
         }
 
-        public DtoUser GetAllUsers(int employeeId)
-        {
-            string name = _userRepository.GetUserNameById(employeeId);
-            return new DtoUser
-            {
-                Id = employeeId,
-                Name = name
-            };
-        }
+        public List<DtoUser> GetAllUsers() => _userRepository.GetAllUsers();
     }
 }
 

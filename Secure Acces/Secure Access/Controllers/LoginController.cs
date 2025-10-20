@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Logic.Services;
+using Microsoft.AspNetCore.Connections;
 
 namespace Secure_Access.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly UserService _employeeService;
+        private readonly UserService _userService;
 
-        public LoginController()
+        public LoginController(UserService userService)
         {
-            string connectionString = "YourConnectionStringHere";
-            _employeeService = new UserService(connectionString);
+            _userService = userService;
         }
 
-        public ActionResult Index(int employeeId)
+        public ActionResult Index()
         {
-            var employeeDto = _employeeService.GetEmployee(employeeId);
-            ViewBag.EmployeeName = employeeDto.Name;
-            return View();
+            var users = _userService.GetAllUsers();
+            return View(users);
         }
     }
 }

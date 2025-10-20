@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Logic.Dto
 {
-    public class DtoEmployee
+    public class DtoUser
     {
         public int Id { get; set; }
         public string Name {  get; set; }
