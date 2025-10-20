@@ -1,0 +1,21 @@
+﻿@model List<Logic.Classes.Door>
+
+<h2>Doors in Group</h2>
+
+@if (!Model.Any())
+{
+    <p>No doors found in this group.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var door in Model)
+        {
+            <li class="list-group-item">
+                <a asp-action="DoorDetails" asp-route-id="@door.getId()">@door.getName()</a>
+            </li>
+        }
+    </ul>
+}
+
+<a class="btn btn-secondary mt-3" asp-action="Index">Back to Groups</a>
