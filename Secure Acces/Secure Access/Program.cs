@@ -1,9 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using DAL;
+using Logic.Interface;
+using Logic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddScoped<IUserRepository>(provider => new UserRepository(connectionString));
+builder.Services.AddScoped<UserService>();
 
 // Add MVC services
 builder.Services.AddControllersWithViews();

@@ -5,12 +5,12 @@ namespace Secure_Access.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly EmployeeService _employeeService;
+        private readonly UserService _employeeService;
 
         public LoginController()
         {
             string connectionString = "YourConnectionStringHere";
-            _employeeService = new EmployeeService(connectionString);
+            _employeeService = new UserService(connectionString);
         }
 
         public ActionResult Index(int employeeId)
