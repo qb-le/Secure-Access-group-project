@@ -22,7 +22,7 @@
     </tr>
 </table>
 
-<button type="submit" class="btn btn-success">Open Door</button>
+<a asp-area="" asp-controller="QR" asp-action="QRLogin" class="btn btn-primary">Get QR code</a>
 
 
-<a class="btn btn-secondary mt-3" asp-action="GroupDetails" asp-route-id="@Model.getGroupId()">Back to Group</a>
+<a class="btn btn-secondary" asp-action="GroupDetails" asp-route-id="@Model.getGroupId()">Back to Group</a>

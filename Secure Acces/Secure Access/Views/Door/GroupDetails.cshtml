@@ -8,11 +8,11 @@
 }
 else
 {
-    <ul class="list-group">
+    <ul class="list-group" >
         @foreach (var door in Model)
         {
             <li class="list-group-item">
-                <a asp-action="DoorDetails" asp-route-id="@door.getId()">@door.getName()</a>
+                <a asp-action="DoorDetails" class="btn btn-outline-primary" asp-route-id="@door.getId()">@door.getName()</a>
             </li>
         }
     </ul>

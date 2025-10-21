@@ -1,10 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Login Page";
 }
-<div>
 
+<div class="container">
+    <div class="d-flex justify-content-center mt-5">
+        <form method="post" asp-controller="Door" asp-action="Index" class="p-5 border rounded bg-light shadow w-50">
+            <h2 class="text-center mb-4">Login</h2>
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="text" name="email" class="form-control form-control-lg" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password:</label>
+                <input type="password" name="password" class="form-control form-control-lg" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Login</button>
+            <hr class="my-4">
+
+
+        </form>
+    </div>
 </div>
 
-<div>
-    <a class="" asp-controller="Home" asp-action="Index">Login</a>>
-</div>
