@@ -22,7 +22,17 @@
     </tr>
 </table>
 
-<a asp-area="" asp-controller="QR" asp-action="QRLogin" class="btn btn-primary">Get QR code</a>
-
+<form asp-controller="QR" asp-action="SendQR" method="post">
+    <input type="hidden" name="doorId" value="@Model.getId()" />
+    <div class="mb-2">
+        <label>Email:</label>
+        <input type="email" name="receiverEmail" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Receiver Name:</label>
+        <input type="text" name="receiverName" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Send QR Code</button>
+</form>
 
 <a class="btn btn-secondary" asp-action="GroupDetails" asp-route-id="@Model.getGroupId()">Back to Group</a>
