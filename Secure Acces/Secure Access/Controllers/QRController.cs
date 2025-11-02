@@ -19,6 +19,11 @@ namespace Secure_Access.Controllers
             _email = new Email();
         }
 
+        public IActionResult Scanner()
+        {
+            return View();
+        }
+
         public IActionResult QRLogin()
         {
             var qrToken = _qrManager.GenerateToken();
@@ -60,8 +65,6 @@ namespace Secure_Access.Controllers
             TempData["Message"] = $"QR code sent to {receiverEmail}.";
             return RedirectToAction("DoorDetails", "Door", new { id = doorId });
         }
-
-
 
         public IActionResult Scan(string token)
         {

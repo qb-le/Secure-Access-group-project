@@ -13,7 +13,7 @@
         const response = await fetch(`/QR/CheckScan?token=${token}`);
         const data = await response.json();
         if(data.scanned){
-            window.location.href = '/Account/Login'; // redirect PC to login
+            window.location.href = '/Account/Login'; 
         }
     }, 2000);
 </script>

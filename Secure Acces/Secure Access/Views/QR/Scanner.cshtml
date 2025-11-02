@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "QR Scanner";
+}
+
+<h2 class="text-center mt-3 mb-4">Door QR Scanner</h2>
+
+<div class="text-center">
+    <video id="camera" style="width: 400px; border: 3px solid #888; border-radius: 10px;"></video>
+    <p id="status" class="mt-3">Click "Start Scanner" to begin</p>
+
+    <button id="startBtn" class="btn btn-primary mt-2">Start Scanner</button>
+    <button id="stopBtn" class="btn btn-danger mt-2" style="display:none;">Stop Scanner</button>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="~/js/qrScanner.js"></script>
+}
