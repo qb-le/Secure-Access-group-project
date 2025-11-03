@@ -23,11 +23,6 @@ namespace Logic.Classes
             this.doors = doors;
         }
 
-        public List<Door> GetDoors()
-        {
-            return doors;
-        }
-
         public int getId()
         {
             return _id;
