@@ -1,36 +1,46 @@
-﻿using System;
+﻿using Logic.Classes;
+using System;
 using System.Collections.Concurrent;
 
 namespace Secure_Access.Services
 {
     public class QRTokenManager
     {
-        // In-memory storage
-        private readonly ConcurrentDictionary<string, bool> _tokens = new();
+        private readonly ConcurrentDictionary<string, QRTokenInfo> _tokens = new();
 
-        // Generate and store a new token
-        public string GenerateToken()
+        public string GenerateToken(string name, string email, int doorId)
         {
             var token = Guid.NewGuid().ToString();
-            _tokens[token] = false;
+            _tokens[token] = new QRTokenInfo
+            {
+                Scanned = false,
+                Name = name,
+                Email = email,
+                DoorId = doorId,
+            };
             return token;
         }
 
-        // Mark a token as scanned
         public bool MarkAsScanned(string token)
         {
-            if (_tokens.ContainsKey(token))
+            if (string.IsNullOrEmpty(token)) return false;
+
+            if (_tokens.TryGetValue(token, out var info))
             {
-                _tokens[token] = true;
+                info.Scanned = true;
                 return true;
             }
             return false;
         }
 
-        // Check if token has been scanned
+        public QRTokenInfo? GetInfo(string token)
+        {
+            return _tokens.TryGetValue(token, out var info) ? info : null;
+        }
         public bool IsScanned(string token)
         {
-            return _tokens.ContainsKey(token) && _tokens[token];
+            if (string.IsNullOrEmpty(token)) return false;
+            return _tokens.TryGetValue(token, out var info) && info.Scanned;
         }
     }
 }

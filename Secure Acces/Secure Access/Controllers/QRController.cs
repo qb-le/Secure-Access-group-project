@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Logic.Classes;
+using Logic.Interface;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using QRCoder;
+using Secure_Access.Services;
 using System.Drawing.Imaging;
 using System.IO;
-using Secure_Access.Services;
-using Logic.Classes;
+using static QRCoder.PayloadGenerator;
 
 namespace Secure_Access.Controllers
 {
@@ -11,12 +14,16 @@ namespace Secure_Access.Controllers
     {
         private readonly QRTokenManager _qrManager;
         private readonly Email _email;
+        private readonly IHubContext<AccessHub> _hubContext;
+        private readonly IReceptionService _receptionService;
 
         // Inject the manager
-        public QRController(QRTokenManager qrManager)
+        public QRController(QRTokenManager qrManager, IHubContext<AccessHub> hubContext, IReceptionService receptionService)
         {
             _qrManager = qrManager;
             _email = new Email();
+            _hubContext = hubContext;
+            _receptionService = receptionService;
         }
 
         public IActionResult Scanner()
@@ -26,8 +33,8 @@ namespace Secure_Access.Controllers
 
         public IActionResult QRLogin()
         {
-            var qrToken = _qrManager.GenerateToken();
-            ViewBag.QRToken = qrToken;
+            //var qrToken = _qrManager.GenerateToken();
+            //ViewBag.QRToken = qrToken;
             return View();
         }
 
@@ -47,8 +54,15 @@ namespace Secure_Access.Controllers
 
         public IActionResult SendQR(int doorId, string receiverEmail, string receiverName)
         {
-            var token = _qrManager.GenerateToken();
-            var url = Url.Action("Scan", "QR", new { token }, Request.Scheme);
+            var token = _qrManager.GenerateToken(receiverName, receiverEmail, doorId);
+
+            var url = Url.Action("Scan", "QR", new
+            {
+                token,
+                name = receiverName,
+                email = receiverEmail,
+                doorId
+            }, Request.Scheme);
 
             using var qrGenerator = new QRCodeGenerator();
             using var qrData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
@@ -66,12 +80,27 @@ namespace Secure_Access.Controllers
             return RedirectToAction("DoorDetails", "Door", new { id = doorId });
         }
 
-        public IActionResult Scan(string token)
+        public async Task<IActionResult> Scan(string token)
         {
             if (_qrManager.MarkAsScanned(token))
             {
+                var info = _qrManager.GetInfo(token);
+
+                var request = new Request(
+                    info.Name,
+                    info.Email,
+                    info.DoorId,
+                    DateTime.UtcNow,
+                    2
+                );
+
+                await _receptionService.AddRequestAsync(request);
+                await _hubContext.Clients.Group("Receptionists")
+                        .SendAsync("ReceiveNotification", request);
+
                 return Content("Scan successful! You can close the phone browser.");
             }
+
             return Content("Invalid QR token.");
         }
 

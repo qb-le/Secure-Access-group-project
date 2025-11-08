@@ -6,6 +6,7 @@ using Logic.Service;
 using Logic.Services;
 using Microsoft.EntityFrameworkCore;
 using Secure_Access.Services;
+using Logic.Classes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,14 +18,30 @@ builder.Services.AddScoped<IDoorRepository>(provider => new DoorRepository(conne
 builder.Services.AddScoped<IDoorService, DoorService>();
 builder.Services.AddSingleton<QRTokenManager>();
 builder.Services.AddScoped<IReceptionService, ReceptionService>();
+builder.Services.AddScoped<IReceptionistRepository>(provider => new ReceptionistRepository(connectionString));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
 
 
 
 
 // Add MVC services
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
+
+app.MapControllers();
+app.MapHub<AccessHub>("/accessHub");
+app.UseCors("AllowAll");
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

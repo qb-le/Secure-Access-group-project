@@ -16,19 +16,19 @@ public class ReceptionController : Controller
     
     public ActionResult ReceptionistDashboard()
     {
-        var requests = _receptionService.GetAllRequests(); // Get requests from service
+        var requests = _receptionService.GetAllRequests();
         return View(requests);
     }
 
     public IActionResult Grant(int id)
     {
-        _receptionService.GrantAccess(id);
+        //_receptionService.GrantAccess(id);
         return RedirectToAction("ReceptionistDashboard");
     }
 
     public IActionResult Reject(int id)
     {
-        _receptionService.RejectAccess(id);
+        //_receptionService.RejectAccess(id);
         return RedirectToAction("ReceptionistDashboard");
     }
 }

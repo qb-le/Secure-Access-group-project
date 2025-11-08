@@ -2,43 +2,84 @@
 
 <h2>Receptionist Dashboard</h2>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+            // 1. Build connection to your AccessHub
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/accessHub") // must match app.MapHub<AccessHub>("/accessHub")
+                .build();
+
+            // 2. Register handler for ReceiveNotification
+                    connection.on("ReceiveNotification", function (request) {
+        const table = document.querySelector("table tbody");
+        const row = table.insertRow();
+
+
+        row.insertCell(0).innerText = request.doorId;
+        row.insertCell(1).innerText = request.name;
+        row.insertCell(2).innerText = request.status;
+        row.insertCell(3).innerText = new Date(request.requestTime).toLocaleTimeString();
+
+        // Actions
+        const actionsCell = row.insertCell(4);
+        if (request.status === 2) {
+            actionsCell.innerHTML = `
+                <form action="/Receptionist/GrantAccess" method="post" style="display:inline">
+                    <input type="hidden" name="id" value="${request.id}" />
+                    <button class="btn btn-success">Grant</button>
+                </form>
+                <form action="/Receptionist/RejectAccess" method="post" style="display:inline">
+                    <input type="hidden" name="id" value="${request.id}" />
+                    <button class="btn btn-danger">Reject</button>
+                </form>
+            `;
+        } else {
+            actionsCell.innerText = request.status;
+        }
+    });
+
+            // 3. Start the connection
+            connection.start()
+                .then(() => console.log("Connected to AccessHub"))
+                .catch(err => console.error("SignalR connection error: ", err));
+</script>
+
 <table class="table">
     <thead>
-    <tr>
-        <th>Door</th>
-        <th>Requester</th>
-        <th>Status</th>
-        <th>DoorGroup</th>
-        <th>Time</th>
-    </tr>
+        <tr>
+            <th>Door</th>
+            <th>Requester</th>
+            <th>Status</th>
+            <th>Time</th>
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var r in Model)
-    {
-        <tr>
-            <td>@r.Door</td>
-            <td>@r.Name</td>
-            <td>@r.Status</td>
-            <td>@r.DoorGroup</td>
-            <td>@r.RequestTime.ToShortTimeString()</td>
-            <td>
-                @if (r.Status == "Pending")
-                {
-                    <form asp-action="GrantAccess" method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@r.Id" />
-                        <button class="btn btn-success">Grant</button>
-                    </form>
-                    <form asp-action="RejectAccess" method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@r.Id" />
-                        <button class="btn btn-danger">Reject</button>
-                    </form>
-                }
-                else
-                {
-                    <span>@r.Status</span>
-                }
-            </td>
-        </tr>
-    }
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.DoorId</td>
+                <td>@r.Name</td>
+                <td>@r.Status</td>
+                <td>@r.RequestTime.ToShortTimeString()</td>
+                <td>
+                    @if (r.Status == 2)
+                    {
+                        <form asp-action="GrantAccess" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <button class="btn btn-success">Grant</button>
+                        </form>
+                        <form asp-action="RejectAccess" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <button class="btn btn-danger">Reject</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>@r.Status</span>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

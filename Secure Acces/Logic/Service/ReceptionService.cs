@@ -1,32 +1,27 @@
 using Logic.Classes;
 using Logic.Interface;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Logic.Service;
 
 public class ReceptionService : IReceptionService
 {
-    private static List<Request> requests = new List<Request>
+    private readonly IReceptionistRepository _repository;
+    private readonly IHubContext<AccessHub> _hubContext;
+
+    public ReceptionService(IReceptionistRepository repository, IHubContext<AccessHub> hubContext)
     {
-        new Request { Id = 1, Name = "Hanna Thomas", DoorGroup = "AirBNB", Door = "Front Entrance" },
-        new Request { Id = 2, Name = "Micheal Leon", DoorGroup = "Office", Door = "Staff Room" },
-    };
+        _repository = repository;
+        _hubContext = hubContext;
+    }
+
+    public async Task AddRequestAsync(Request request)
+    {
+        _repository.AddRequest(request);
+    }
 
     public List<Request> GetAllRequests()
     {
-        return requests;
-    }
-
-    public void GrantAccess(int id)
-    {
-        var req = requests.FirstOrDefault(r => r.Id == id);
-        if (req != null)
-            req.Status = "Granted";
-    }
-
-    public void RejectAccess(int id)
-    {
-        var req = requests.FirstOrDefault(r => r.Id == id);
-        if (req != null)
-            req.Status = "Rejected";
+       return _repository.GetAllRequests();
     }
 }
