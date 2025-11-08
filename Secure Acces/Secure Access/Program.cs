@@ -16,6 +16,9 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IDoorRepository>(provider => new DoorRepository(connectionString));
 builder.Services.AddScoped<IDoorService, DoorService>();
 builder.Services.AddSingleton<QRTokenManager>();
+builder.Services.AddScoped<IReceptionService, ReceptionService>();
+
+
 
 
 // Add MVC services

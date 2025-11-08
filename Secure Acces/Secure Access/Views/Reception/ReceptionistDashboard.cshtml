@@ -1,0 +1,44 @@
+@model IEnumerable<Logic.Classes.Request>
+
+<h2>Receptionist Dashboard</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Door</th>
+        <th>Requester</th>
+        <th>Status</th>
+        <th>DoorGroup</th>
+        <th>Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.Door</td>
+            <td>@r.Name</td>
+            <td>@r.Status</td>
+            <td>@r.DoorGroup</td>
+            <td>@r.RequestTime.ToShortTimeString()</td>
+            <td>
+                @if (r.Status == "Pending")
+                {
+                    <form asp-action="GrantAccess" method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <button class="btn btn-success">Grant</button>
+                    </form>
+                    <form asp-action="RejectAccess" method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <button class="btn btn-danger">Reject</button>
+                    </form>
+                }
+                else
+                {
+                    <span>@r.Status</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
