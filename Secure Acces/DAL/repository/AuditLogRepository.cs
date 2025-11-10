@@ -54,14 +54,21 @@ namespace DAL.repository
             return logs;
         }
 
-        public List<DtoAuditLog> GetAuditLogsByDoorId(int doorId)
+        public void InsertAuditLog(DtoAuditLog log)
         {
-            throw new NotImplementedException();
-        }
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "INSERT INTO AuditLogs (UserId, DoorId, LogTime) VALUES (@UserId, @DoorId, GETDATE())";
 
-        public List<DtoAuditLog> GetAuditLogsByUserId(int userId)
-        {
-            throw new NotImplementedException();
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", log.UserId);
+                    cmd.Parameters.AddWithValue("@DoorId", log.DoorId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

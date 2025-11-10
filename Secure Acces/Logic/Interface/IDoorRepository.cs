@@ -8,5 +8,6 @@ namespace DAL.Interfaces
         List<DoorGroup> GetAllDoorGroups();
         List<Door> GetDoorsByGroupId(int groupId);
         Door? GetDoorById(int id);
+        List<Door> GetAllDoors();
     }
 }

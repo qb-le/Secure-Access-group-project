@@ -1,4 +1,6 @@
-﻿using Logic.Classes;
+﻿using DAL.Interfaces;
+using Logic.Classes;
+using Logic.Dto;
 using Logic.Interface;
 using System;
 using System.Collections.Generic;
@@ -8,28 +10,48 @@ using System.Threading.Tasks;
 
 namespace Logic.Service
 {
-    public class AuditLogService : IAuditLogService
+    public class AuditLogService
     {
-        private readonly IAuditLogRepository _repository;
+        private readonly IAuditLogRepository _logRepository;
+        private readonly IDoorRepository _doorRepository;
 
-        public AuditLogService(IAuditLogRepository repository) 
+        public AuditLogService(IAuditLogRepository logRepository, IDoorRepository doorRepository)
         {
-            _repository = repository;
+            _logRepository = logRepository;
+            _doorRepository = doorRepository;
+
         }
 
-        public List<AuditLog> GetAllAuditLogs()
+        public List<AuditLog> GetAllLogs()
         {
-            return _repository.GetAllAuditLogs();
+            var dtoLogs = _logRepository.GetAllAuditLogs();
+            var doors = _doorRepository.GetAllDoors();
+
+            var logs = new List<AuditLog>();
+
+            foreach (var dto in dtoLogs)
+            {
+                var door = doors.FirstOrDefault(d => d.getId() == dto.DoorId);
+
+                if (door != null)
+                {
+                    logs.Add(new AuditLog(dto.Id, door, dto.Date, dto.UserId));
+                }
+            }
+
+            return logs;
         }
 
-        public List<AuditLog> GetAuditLogsByDoorId(int doorId)
-        {
-            return _repository.GetAuditLogsByDoorId(doorId);
-        }
 
-        public List<AuditLog> GetAuditLogsByUserId(int userId)
+        public void AddLogDoorAccess(int userId, int doorId)
         {
-            return _repository.GetAuditLogsByUserId(userId);
+            var newlog = new DtoAuditLog()
+            {
+                UserId = userId,
+                DoorId = doorId
+            };
+
+            _logRepository.InsertAuditLog(newlog);
         }
     }
 }
