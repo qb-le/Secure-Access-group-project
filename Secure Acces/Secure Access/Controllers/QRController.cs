@@ -98,11 +98,17 @@ namespace Secure_Access.Controllers
                 await _hubContext.Clients.Group("Receptionists")
                         .SendAsync("ReceiveNotification", request);
 
-                return Content("Scan successful! You can close the phone browser.");
+                return Json(new
+                {
+                    success = true,
+                    email = info.Email,
+                    message = "Scan successful! Waiting for access..."
+                });
             }
 
-            return Content("Invalid QR token.");
+            return Json(new { success = false, message = "Invalid QR token." });
         }
+
 
         public IActionResult CheckScan(string token)
         {

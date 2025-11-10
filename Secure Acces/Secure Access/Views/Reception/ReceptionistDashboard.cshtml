@@ -4,44 +4,51 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script>
-            // 1. Build connection to your AccessHub
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl("/accessHub") // must match app.MapHub<AccessHub>("/accessHub")
-                .build();
+    // ----------------- SignalR Setup -----------------
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/accessHub")
+        .build();
 
-            // 2. Register handler for ReceiveNotification
-                    connection.on("ReceiveNotification", function (request) {
+    connection.on("ReceiveNotification", function (request) {
+        addRequestRow(request);
+    });
+
+    connection.start()
+        .then(() => console.log("Connected to AccessHub"))
+        .catch(err => console.error("SignalR connection error:", err));
+
+    // ----------------- Add Row Function -----------------
+    function addRequestRow(request) {
         const table = document.querySelector("table tbody");
         const row = table.insertRow();
-
 
         row.insertCell(0).innerText = request.doorId;
         row.insertCell(1).innerText = request.name;
         row.insertCell(2).innerText = request.status;
         row.insertCell(3).innerText = new Date(request.requestTime).toLocaleTimeString();
 
-        // Actions
         const actionsCell = row.insertCell(4);
+
         if (request.status === 2) {
             actionsCell.innerHTML = `
-                <form action="/Receptionist/GrantAccess" method="post" style="display:inline">
-                    <input type="hidden" name="id" value="${request.id}" />
-                    <button class="btn btn-success">Grant</button>
-                </form>
-                <form action="/Receptionist/RejectAccess" method="post" style="display:inline">
-                    <input type="hidden" name="id" value="${request.id}" />
-                    <button class="btn btn-danger">Reject</button>
-                </form>
+                <button class="btn btn-success" onclick="grantAccess(${request.id})">Grant</button>
+                <button class="btn btn-danger" onclick="rejectAccess(${request.id})">Reject</button>
             `;
         } else {
             actionsCell.innerText = request.status;
         }
-    });
+    }
 
-            // 3. Start the connection
-            connection.start()
-                .then(() => console.log("Connected to AccessHub"))
-                .catch(err => console.error("SignalR connection error: ", err));
+    // ----------------- Grant/Reject Functions -----------------
+    async function grantAccess(id) {
+        await fetch(`/Reception/GrantAccess?id=${id}`, { method: 'POST' });
+        console.log(`Grant request sent for ID: ${id}`);
+    }
+
+    async function rejectAccess(id) {
+        await fetch(`/Reception/RejectAccess?id=${id}`, { method: 'POST' });
+        console.log(`Reject request sent for ID: ${id}`);
+    }
 </script>
 
 <table class="table">
@@ -65,14 +72,8 @@
                 <td>
                     @if (r.Status == 2)
                     {
-                        <form asp-action="GrantAccess" method="post" style="display:inline">
-                            <input type="hidden" name="id" value="@r.Id" />
-                            <button class="btn btn-success">Grant</button>
-                        </form>
-                        <form asp-action="RejectAccess" method="post" style="display:inline">
-                            <input type="hidden" name="id" value="@r.Id" />
-                            <button class="btn btn-danger">Reject</button>
-                        </form>
+                        <button class="btn btn-success" onclick="grantAccess(@r.Id)">Grant</button>
+                        <button class="btn btn-danger" onclick="rejectAccess(@r.Id)">Reject</button>
                     }
                     else
                     {

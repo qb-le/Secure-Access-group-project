@@ -2,6 +2,8 @@
 let scanning = false;
 let stream = null;
 let statusEl = null;
+let connection = null;
+let employeeEmail = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     video = document.getElementById('camera');
@@ -9,6 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('startBtn').addEventListener('click', startScanner);
     document.getElementById('stopBtn').addEventListener('click', stopScanner);
+
+    // Initialize SignalR connection
+    connection = new signalR.HubConnectionBuilder()
+        .withUrl("/accessHub")
+        .build();
+
+    connection.on("ReceiveAccessNotification", (message) => {
+        statusEl.innerHTML = `<strong>${message}</strong>`;
+        if (message.includes("Granted")) document.body.style.backgroundColor = "#90EE90";
+        if (message.includes("Denied")) document.body.style.backgroundColor = "#FFB6C1";
+    });
+
+    connection.start()
+        .then(() => console.log("Connected to AccessHub"))
+        .catch(err => console.error("SignalR connection error:", err));
 });
 
 async function startScanner() {
@@ -75,9 +92,21 @@ function extractToken(qrData) {
 
 async function sendToServer(token) {
     try {
+        statusEl.innerHTML = `<em>Verifying token...</em>`;
+
         const response = await fetch(`/QR/Scan?token=${encodeURIComponent(token)}`);
-        const result = await response.text();
-        statusEl.innerHTML = `<strong>${result}</strong>`;
+        const result = await response.json(); // expects { success, email, message }
+
+        if (result.success) {
+            employeeEmail = result.email;
+            statusEl.innerHTML = `<strong>${result.message}</strong>`;
+
+            // Register employee in SignalR group
+            await connection.invoke("RegisterEmployee", employeeEmail);
+            statusEl.innerHTML += `<br>Waiting for access decision...`;
+        } else {
+            statusEl.innerHTML = `<span style="color:red;">${result.message}</span>`;
+        }
     } catch (err) {
         statusEl.innerHTML = `<span style="color:red;">Error sending QR code: ${err.message}</span>`;
     }

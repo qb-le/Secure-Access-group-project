@@ -1,34 +1,54 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Logic.Classes;
-using Logic.Service;
 using Logic.Interface;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Secure_Access.Controllers;
-
-public class ReceptionController : Controller
+namespace Secure_Access.Controllers
 {
-    private readonly IReceptionService _receptionService;
-    
-    public ReceptionController(IReceptionService receptionService)
+    public class ReceptionController : Controller
     {
-        _receptionService = receptionService;
-    }
-    
-    public ActionResult ReceptionistDashboard()
-    {
-        var requests = _receptionService.GetAllRequests();
-        return View(requests);
-    }
+        private readonly IReceptionService _receptionService;
+        private readonly IHubContext<AccessHub> _hubContext;
 
-    public IActionResult Grant(int id)
-    {
-        //_receptionService.GrantAccess(id);
-        return RedirectToAction("ReceptionistDashboard");
-    }
+        public ReceptionController(IReceptionService receptionService, IHubContext<AccessHub> hubContext)
+        {
+            _receptionService = receptionService;
+            _hubContext = hubContext;
+        }
 
-    public IActionResult Reject(int id)
-    {
-        //_receptionService.RejectAccess(id);
-        return RedirectToAction("ReceptionistDashboard");
+        public ActionResult ReceptionistDashboard()
+        {
+            var requests = _receptionService.GetAllRequests();
+            return View(requests);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GrantAccess(int id)
+        {
+            // Retrieve request info
+            var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
+            if (request != null)
+            {
+
+                request.Status = 1; // 1 = granted, 2 = pending, 3 = rejected
+                await _hubContext.Clients.Group(request.Email)
+                    .SendAsync("ReceiveAccessNotification", "Access Granted! You may enter.");
+            }
+
+            return RedirectToAction("ReceptionistDashboard");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectAccess(int id)
+        {
+            var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
+            if (request != null)
+            {
+                await _hubContext.Clients.Group(request.Email)
+                    .SendAsync("ReceiveAccessNotification", "Access Denied!  Please contact reception.");
+            }
+
+            return RedirectToAction("ReceptionistDashboard");
+        }
     }
 }
