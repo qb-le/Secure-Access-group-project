@@ -40,13 +40,14 @@ namespace DAL.repository
                         int id = reader.GetInt32(reader.GetOrdinal("Id"));
                         string name = reader.GetString(reader.GetOrdinal("Name"));
                         string email = reader.GetString(reader.GetOrdinal("Email"));
+                        int doorId = reader.GetInt32(reader.GetOrdinal("DoorId"));
                         string doorname = reader.GetString(reader.GetOrdinal("doorName"));
                         DateTime requestTime = reader.GetDateTime(reader.GetOrdinal("RequestTime"));
                         int status = reader.GetInt32(reader.GetOrdinal("Status"));
 
                         requests.Add(new Request
                         (
-                            id, name, email, doorname, requestTime, status
+                            id, name, email, doorId, doorname, requestTime, status
                         ));
                     }
                 }
@@ -70,6 +71,27 @@ namespace DAL.repository
                     command.Parameters.AddWithValue("@DoorId", request.DoorId);
                     command.Parameters.AddWithValue("@RequestTime", request.RequestTime);
                     command.Parameters.AddWithValue("@Status", request.Status);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+        public void UpdateRequestStatus(int requestId, int status)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var query = @"
+                        UPDATE Request
+                        SET Status = @Status
+                        WHERE Id = @RequestId;";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Status", status);
+                    command.Parameters.AddWithValue("@RequestId", requestId);
+
                     command.ExecuteNonQuery();
                 }
             }
