@@ -13,11 +13,12 @@ public class Request
     public int Status { get; set; } = 2;
     // 0 = Rejected 1 = approved 2 = pending
 
-    public Request(int id, string name, string email, string doorname, DateTime requesttime, int status)
+    public Request(int id, string name, string email,int doorId, string doorname, DateTime requesttime, int status)
     {
         Id = id;
         Name = name;
         Email = email;
+        DoorId = doorId;
         Door = doorname;
         RequestTime = requesttime;
         Status = status;
