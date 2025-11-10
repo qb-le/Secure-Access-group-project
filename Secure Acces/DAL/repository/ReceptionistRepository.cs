@@ -29,7 +29,7 @@ namespace DAL.repository
             {
                 conn.Open();
 
-                string request = @"SELECT rq.Id, rq.Name, rq.Email, d.Name AS doorName, rq.RequestTime, rq.Status  
+                string request = @"SELECT rq.Id, rq.Name, rq.Email, rq.DoorId, d.Name AS doorName, rq.RequestTime, rq.Status  
                                 FROM Request rq
                                 INNER JOIN Door d ON rq.DoorId = d.door_id";
                 using (SqlCommand cmd = new SqlCommand(request, conn))

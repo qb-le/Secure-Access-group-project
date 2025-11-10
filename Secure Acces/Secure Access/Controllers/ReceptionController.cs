@@ -33,6 +33,7 @@ namespace Secure_Access.Controllers
                 request.Status = 1; // 1 = granted, 2 = pending, 3 = rejected
                 await _hubContext.Clients.Group(request.Email)
                     .SendAsync("ReceiveAccessNotification", "Access Granted! You may enter.");
+                _receptionService.UpdateRequestStatus(id, 1);
             }
 
             return RedirectToAction("ReceptionistDashboard");
@@ -46,6 +47,7 @@ namespace Secure_Access.Controllers
             {
                 await _hubContext.Clients.Group(request.Email)
                     .SendAsync("ReceiveAccessNotification", "Access Denied!  Please contact reception.");
+                _receptionService.UpdateRequestStatus(id, 0);
             }
 
             return RedirectToAction("ReceptionistDashboard");

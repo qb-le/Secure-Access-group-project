@@ -24,4 +24,9 @@ public class ReceptionService : IReceptionService
     {
        return _repository.GetAllRequests();
     }
+
+    public void UpdateRequestStatus(int requestId, int status)
+    {
+        _repository.UpdateRequestStatus(requestId, status);
+    }
 }
