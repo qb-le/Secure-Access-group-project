@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddScoped<IAuditLogRepository>(provider  => new  AuditLogRepository(connectionString));
+builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddScoped<IUserRepository>(provider => new UserRepository(connectionString));
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IDoorRepository>(provider => new DoorRepository(connectionString));

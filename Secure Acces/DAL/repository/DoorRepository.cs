@@ -98,5 +98,28 @@ namespace DAL.repository
 
             return door;
         }
+
+        public List<Door> GetAllDoors()
+        {
+            var doors = new List<Door>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string groupQuery = "SELECT * FROM Door";
+                using (SqlCommand cmd = new SqlCommand(groupQuery, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32(0);
+                        string name = reader.GetString(1);
+                        int groupId = reader.GetInt32(2);
+                    }
+                }
+            }
+            return doors;
+        }
     }
 }
