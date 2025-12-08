@@ -5,53 +5,94 @@ using Logic.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Logic.Service
 {
     public class AuditLogService
     {
-        private readonly IAuditLogRepository _logRepository;
-        private readonly IDoorRepository _doorRepository;
+        private readonly IAuditLogRepository _logRepo;
+        private readonly IDoorRepository _doorRepo;
+        private readonly IUserRepository _userRepo;
 
-        public AuditLogService(IAuditLogRepository logRepository, IDoorRepository doorRepository)
+        public AuditLogService(IAuditLogRepository logRepo, IDoorRepository doorRepo, IUserRepository userRepo)
         {
-            _logRepository = logRepository;
-            _doorRepository = doorRepository;
-
+            _logRepo = logRepo;
+            _doorRepo = doorRepo;
+            _userRepo = userRepo;
         }
 
-        public List<AuditLog> GetAllLogs()
+        public List<DtoAuditLog> GetAllLogsDto()
         {
-            var dtoLogs = _logRepository.GetAllAuditLogs();
-            var doors = _doorRepository.GetAllDoors();
-
-            var logs = new List<AuditLog>();
-
-            foreach (var dto in dtoLogs)
-            {
-                var door = doors.FirstOrDefault(d => d.getId() == dto.DoorId);
-
-                if (door != null)
-                {
-                    logs.Add(new AuditLog(dto.Id, door, dto.Date, dto.UserId));
-                }
-            }
-
-            return logs;
+            return _logRepo.GetAllAuditLogs();
+            
         }
 
-
-        public void AddLogDoorAccess(int userId, int doorId)
+        public List<DtoAuditLog> GetLogsByUserDto(int userId)
         {
-            var newlog = new DtoAuditLog()
-            {
-                UserId = userId,
-                DoorId = doorId
-            };
+            return _logRepo.GetAuditLogsByUserId(userId);
+        }
 
-            _logRepository.InsertAuditLog(newlog);
+        public List<DtoAuditLog> GetLogsByDoorDto(int doorId)
+        {
+            return _logRepo.GetAuditLogsByDoorId(doorId);
+        }
+
+        public List<AuditLog> GetAllLogsRich()
+        {
+            var dtoLogs = _logRepo.GetAllAuditLogs();
+            return AuditLogMapper.ToRichModels(dtoLogs, _doorRepo);
+        }
+
+        public List<AuditLog> GetLogsByUserRich(int userId)
+        {
+            var dtoLogs = _logRepo.GetAuditLogsByUserId(userId);
+            return AuditLogMapper.ToRichModels(dtoLogs, _doorRepo);
+        }
+
+        public List<AuditLog> GetLogsByDoorRich(int doorId)
+        {
+            var dtoLogs = _logRepo.GetAuditLogsByDoorId(doorId);
+            return AuditLogMapper.ToRichModels(dtoLogs, _doorRepo);
+        }
+
+        public void LogDoorOpenRequest(int userId, int doorId)
+        {
+            var door = _doorRepo.GetDoorById(doorId);
+            var log = AuditLog.CreateDoorOpenRequest(userId, door);
+            SaveLog(log);
+        }
+
+        public void LogDoorAccessGranted(int userId, int doorId)
+        {
+            var door = _doorRepo.GetDoorById(doorId);
+            var log = AuditLog.CreateDoorAccessGranted(userId, door);
+            SaveLog(log);
+        }
+
+        public void LogDoorAccessDenied(int userId, int doorId, string reason)
+        {
+            var door = _doorRepo.GetDoorById(doorId);
+            var log = AuditLog.CreateDoorAccessDenied(userId, door, reason);
+            SaveLog(log);
+        }
+
+        public void LogQrCodeRequest(int userId, string qrValue)
+        {
+            var log = AuditLog.CreateQrCodeRequest(userId, qrValue);
+            SaveLog(log);
+        }
+
+        public void LogLoginAttempt(int userId, bool success, string ip)
+        {
+            var log = AuditLog.CreateLoginAttempt(userId, success, ip);
+            SaveLog(log);
+        }
+        
+        private void SaveLog(AuditLog log)
+        {
+
+            var dto = AuditLogMapper.ToDto(log, _userRepo);
+            _logRepo.InsertAuditLog(dto);
         }
     }
 }
