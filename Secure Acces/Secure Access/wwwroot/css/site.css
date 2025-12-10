@@ -398,3 +398,79 @@ a:not(.btn):hover {
         print-color-adjust: exact;
     }
 }
+/* FIXED HEADER */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border-bottom: 2px solid #f2f2f2;
+    z-index: 1030;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+}
+
+/* LOGO */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #373f46 !important;
+}
+
+/* LEFT NAV LINKS AS BUTTONS */
+.navbar-nav.flex-grow-1 .nav-link {
+    background-color: #a7002b; /* red background */
+    color: #fff !important; /* white text */
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    text-align: center;
+    display: inline-block;
+    transition: background-color 0.2s;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+    .navbar-nav.flex-grow-1 .nav-link:hover,
+    .navbar-nav.flex-grow-1 .nav-link.active {
+        background-color: #232f5c; /* darker hover */
+    }
+
+/* RIGHT NAV BUTTON (Logout) */
+.navbar-nav.ms-auto .nav-link {
+    background-color: #a7002b;
+    color: #fff !important;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    text-align: center;
+    display: inline-block;
+    transition: background-color 0.2s;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+    .navbar-nav.ms-auto .nav-link:hover {
+        background-color: #232f5c;
+    }
+
+/* BODY SPACING BELOW FIXED HEADER */
+body {
+    padding-top: 80px; /* adjust if navbar height changes */
+}
+
+.footer {
+    position: fixed; /* always visible at bottom */
+    left: 0;
+    bottom: 0;
+    width: 100%; /* full width */
+    background-color: #293743; /* dark gray */
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    z-index: 1000; /* above other elements */
+}
