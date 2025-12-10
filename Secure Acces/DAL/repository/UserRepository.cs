@@ -1,8 +1,9 @@
-﻿using Microsoft;
-using System.Data;
-using Microsoft.Data.SqlClient;
-using Logic.Dto;
+﻿using Logic.Dto;
 using Logic.Interface;
+using Microsoft;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace DAL
 {
@@ -48,21 +49,15 @@ namespace DAL
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "SELECT name FROM Users WHERE userId = @Id";
-                using (var cmd = new SqlCommand(query, conn))
+                string query = "SELECT name FROM [User] WHERE userId = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@Id", userId);
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string username = reader.GetString(1);
-                            return username;
-                        }
-                    }
+
+                    object result = cmd.ExecuteScalar();
+                    return result?.ToString() ?? $"Unknown User, id={userId}";
                 }
             }
-            return null;
         }
     }
 }

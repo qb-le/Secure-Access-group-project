@@ -11,33 +11,33 @@ namespace Logic.Classes
         public int Id { get; private set; }
         public DateTime Date { get; private set; }
         public int UserId { get; private set; }
-        public Door? Door { get; private set; }
+        public int? DoorId { get; private set; }
         public AuditType AuditType { get; private set; }
         public string? ExtraData { get; private set; }
 
-        public AuditLog(int id, DateTime date, int userId, Door? door, AuditType type, string? extraData)
+        public AuditLog(int id, DateTime date, int userId, int? doorId, AuditType type, string? extraData)
         {
             Id = id;
             Date = date;
             UserId = userId;
-            Door = door;
+            DoorId = doorId;
             AuditType = type;
             ExtraData = extraData;
         }
 
-        public static AuditLog CreateDoorOpenRequest(int userId, Door door)
+        public static AuditLog CreateDoorOpenRequest(int userId, int doorId)
         {
-            return new AuditLog(0, DateTime.Now, userId, door, AuditType.DoorOpenRequest, null);
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorOpenRequest, null);
         }
 
-        public static AuditLog CreateDoorAccessGranted(int userId, Door door)
+        public static AuditLog CreateDoorAccessGranted(int userId, int doorId, string extraData)
         {
-            return new AuditLog(0, DateTime.Now, userId, door, AuditType.DoorAccessGranted, null);
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorAccessGranted, extraData);
         }
 
-        public static AuditLog CreateDoorAccessDenied(int userId, Door door, string reason)
+        public static AuditLog CreateDoorAccessDenied(int userId, int doorId, string reason)
         {
-            return new AuditLog(0, DateTime.Now, userId, door, AuditType.DoorAccessDenied,
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorAccessDenied,
                 $"{{ \"reason\": \"{reason}\" }}");
         }
 
@@ -57,9 +57,9 @@ namespace Logic.Classes
         {
             return AuditType switch
             {
-                AuditType.DoorOpenRequest => $"User {UserId} requested door {Door?.getName()}",
-                AuditType.DoorAccessGranted => $"User {UserId} was granted access to door {Door?.getName()}",
-                AuditType.DoorAccessDenied => $"User {UserId} denied access to door {Door?.getName()}",
+                AuditType.DoorOpenRequest => $"User {UserId} requested door {DoorId}",
+                AuditType.DoorAccessGranted => $"User {UserId} was granted access to door {DoorId}",
+                AuditType.DoorAccessDenied => $"User {UserId} denied access to door {DoorId}",
                 AuditType.QrCodeRequest => $"User {UserId} requested QR code: {ExtraData}",
                 AuditType.LoginAttempt => $"User {UserId} login attempt: {ExtraData}",
                 _ => "Unknown event"

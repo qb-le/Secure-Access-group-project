@@ -23,18 +23,20 @@ namespace Logic.Service
 
         public List<DtoAuditLog> GetAllLogsDto()
         {
-            return _logRepo.GetAllAuditLogs();
-            
+            var richLogs = GetAllLogsRich();
+            return AuditLogMapper.ToDtos(richLogs, _userRepo, _doorRepo);
         }
 
         public List<DtoAuditLog> GetLogsByUserDto(int userId)
         {
-            return _logRepo.GetAuditLogsByUserId(userId);
+            var richLogs = GetLogsByUserRich(userId);
+            return AuditLogMapper.ToDtos(richLogs, _userRepo, _doorRepo);
         }
 
         public List<DtoAuditLog> GetLogsByDoorDto(int doorId)
         {
-            return _logRepo.GetAuditLogsByDoorId(doorId);
+            var richLogs = GetLogsByDoorRich(doorId);
+            return AuditLogMapper.ToDtos(richLogs, _userRepo, _doorRepo);
         }
 
         public List<AuditLog> GetAllLogsRich()
@@ -55,43 +57,52 @@ namespace Logic.Service
             return AuditLogMapper.ToRichModels(dtoLogs, _doorRepo);
         }
 
-        public void LogDoorOpenRequest(int userId, int doorId)
+        public void LogDoorOpenRequest(DtoAuditLog dto)
         {
-            var door = _doorRepo.GetDoorById(doorId);
-            var log = AuditLog.CreateDoorOpenRequest(userId, door);
+            var log = AuditLog.CreateDoorOpenRequest(dto.UserId, dto.DoorId ?? 0);
             SaveLog(log);
         }
 
-        public void LogDoorAccessGranted(int userId, int doorId)
+        public void LogDoorAccessGranted(DtoAuditLog dto)
         {
-            var door = _doorRepo.GetDoorById(doorId);
-            var log = AuditLog.CreateDoorAccessGranted(userId, door);
+            int receptionistUserId = 0; //get actual receptionist userId from session
+
+            string extraData = $"{{ granted For UserId: {dto.UserId} }}";
+
+            var log = AuditLog.CreateDoorAccessGranted(receptionistUserId, dto.DoorId ?? 0, extraData);
             SaveLog(log);
         }
 
-        public void LogDoorAccessDenied(int userId, int doorId, string reason)
+        public void LogDoorAccessDenied(DtoAuditLog dto)
         {
-            var door = _doorRepo.GetDoorById(doorId);
-            var log = AuditLog.CreateDoorAccessDenied(userId, door, reason);
+            int receptionistUserId = 0; //get actual receptionist userId from session
+
+            string extraData = $"{{ denied For UserId: {dto.UserId} }}";
+
+            var log = AuditLog.CreateDoorAccessDenied(receptionistUserId, dto.DoorId ?? 0, extraData);
             SaveLog(log);
         }
 
-        public void LogQrCodeRequest(int userId, string qrValue)
+        public void LogQrCodeRequest(DtoAuditLog dto)
         {
-            var log = AuditLog.CreateQrCodeRequest(userId, qrValue);
+            var qrValue = dto.ExtraData ?? "";
+            var log = AuditLog.CreateQrCodeRequest(dto.UserId, qrValue);
             SaveLog(log);
         }
 
-        public void LogLoginAttempt(int userId, bool success, string ip)
+        public void LogLoginAttempt(DtoAuditLog dto)
         {
-            var log = AuditLog.CreateLoginAttempt(userId, success, ip);
+            bool success = dto.ExtraData?.Contains("true") ?? false;
+            string ip = dto.ExtraData ?? "";
+
+            var log = AuditLog.CreateLoginAttempt(dto.UserId, success, ip);
             SaveLog(log);
         }
-        
+
         private void SaveLog(AuditLog log)
         {
 
-            var dto = AuditLogMapper.ToDto(log, _userRepo);
+            var dto = AuditLogMapper.ToDto(log, _userRepo, _doorRepo);
             _logRepo.InsertAuditLog(dto);
         }
     }
