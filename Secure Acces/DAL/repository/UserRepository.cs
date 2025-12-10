@@ -15,33 +15,54 @@ namespace DAL
             _connectionString = connectionString;
         }
 
-public List<DtoUser> GetAllUsers()
-{
-    var users = new List<DtoUser>();
-
-    using (SqlConnection conn = new SqlConnection(_connectionString))
-    {
-        conn.Open();
-
-        string query = "SELECT userId, Name FROM [user]"; 
-        using (SqlCommand cmd = new SqlCommand(query, conn))
+        public List<DtoUser> GetAllUsers()
         {
-            using (SqlDataReader reader = cmd.ExecuteReader())
+            var users = new List<DtoUser>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                while (reader.Read())
+                conn.Open();
+
+                string query = "SELECT userId, Name FROM [user]";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    users.Add(new DtoUser
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        Id = reader.GetInt32(reader.GetOrdinal("userId")),
-                        Name = reader.GetString(reader.GetOrdinal("Name"))
-                    });
+                        while (reader.Read())
+                        {
+                            users.Add(new DtoUser
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("userId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            });
+                        }
+                    }
                 }
             }
+
+            return users;
         }
-    }
 
-    return users;
-}
-
+        public string GetUserById(int userId)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "SELECT name FROM Users WHERE userId = @Id";
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string username = reader.GetString(1);
+                            return username;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
     }
 }
