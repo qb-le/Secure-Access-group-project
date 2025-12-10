@@ -8,10 +8,10 @@ namespace Logic.Classes
 {
     public enum AuditType
     {
-        DoorOpenRequest = 1,
-        DoorAccessGranted = 2,
-        DoorAccessDenied = 3,
-        QrCodeRequest = 4,
-        LoginAttempt = 5
+        DoorOpenRequest = 0,
+        DoorAccessGranted = 1,
+        DoorAccessDenied = 2,
+        QrCodeRequest = 3,
+        LoginAttempt = 4
     }
 }
