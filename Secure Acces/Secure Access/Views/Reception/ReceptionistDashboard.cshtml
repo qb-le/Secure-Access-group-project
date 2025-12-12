@@ -26,7 +26,7 @@
     // ----------------- Add Row Function -----------------
     function addRequestRow(request) {
         const table = document.querySelector("table tbody");
-        const row = table.insertRow();
+        const row = table.insertRow(0);
 
         row.insertCell(0).innerText = request.doorId;
         row.insertCell(1).innerText = request.name;

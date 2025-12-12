@@ -31,7 +31,8 @@ namespace DAL.repository
 
                 string request = @"SELECT rq.Id, rq.Name, rq.Email, rq.DoorId, d.Name AS doorName, rq.RequestTime, rq.Status  
                                 FROM Request rq
-                                INNER JOIN Door d ON rq.DoorId = d.door_id";
+                                INNER JOIN Door d ON rq.DoorId = d.door_id
+                                ORDER BY rq.Id DESC";
                 using (SqlCommand cmd = new SqlCommand(request, conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
