@@ -14,17 +14,11 @@ namespace Logic.Service
     {
         public static AuditLog ToRichModel(DtoAuditLog dto, IDoorRepository doorRepo)
         {
-            Door? door = null;
-            if (dto.DoorId.HasValue)
-            {
-                door = doorRepo.GetDoorById(dto.DoorId.Value);
-            }
-
             return new AuditLog(
                 id: dto.Id,
                 date: dto.Date,
                 userId: dto.UserId,
-                door: door,
+                doorId: dto.DoorId,
                 type: dto.AuditType,
                 extraData: dto.ExtraData
                 );
@@ -35,26 +29,33 @@ namespace Logic.Service
             return dtoLogs.Select(dto => ToRichModel(dto, doorRepo)).ToList();
         }
 
-        public static DtoAuditLog ToDto(AuditLog log, IUserRepository userRepo)
+        public static DtoAuditLog ToDto(AuditLog log, IUserRepository userRepo, IDoorRepository doorRepo)
         {
             string? userName = userRepo.GetUserById(log.UserId);
+
+            string? doorName = null;
+            if (log.DoorId.HasValue)
+            {
+                var door = doorRepo.GetDoorById(log.DoorId.Value);
+                doorName = door?.getName();
+            }
 
             return new DtoAuditLog
             {
                 Id = log.Id,
                 UserId = log.UserId,
-                DoorId = log.Door?.getId(),
+                DoorId = log.DoorId,
                 Date = log.Date,
                 AuditType = log.AuditType,
                 ExtraData = log.ExtraData,
                 UserName = userName,
-                DoorName = log.Door?.getName()
+                DoorName = doorName
             };
         }
 
-        public static List<DtoAuditLog> ToDtos(List<AuditLog> logs, IUserRepository userRepo)
+        public static List<DtoAuditLog> ToDtos(List<AuditLog> logs, IUserRepository userRepo, IDoorRepository doorRepo)
         {
-            return logs.Select(model => ToDto(model, userRepo)).ToList();
+            return logs.Select(model => ToDto(model, userRepo, doorRepo)).ToList();
         }
 
     }

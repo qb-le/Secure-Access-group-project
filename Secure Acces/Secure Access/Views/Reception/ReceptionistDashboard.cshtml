@@ -31,7 +31,7 @@
         row.insertCell(0).innerText = request.doorId;
         row.insertCell(1).innerText = request.name;
         row.insertCell(2).innerText = statusText(request.status);
-        row.insertCell(3).innerText = new Date(request.requestTime).toLocaleTimeString();
+        row.insertCell(3).innerText = request.requestTime.ToString("dd-MM-yyyy HH:mm");
 
         const actionsCell = row.insertCell(4);
 
@@ -102,7 +102,7 @@
                 <td>@r.DoorId</td>
                 <td>@r.Name</td>
                 <td>@(r.Status == 0 ? "Rejected" : r.Status == 1 ? "Granted" : "Pending")</td>
-                <td>@r.RequestTime.ToShortTimeString()</td>
+                <td>@r.RequestTime.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>
                     @if (r.Status == 2)
                     {
