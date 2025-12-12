@@ -1,10 +1,11 @@
 @model IEnumerable<Logic.Classes.Request>
 @Html.AntiForgeryToken()
-
+window.location.reload()
 <h2>Receptionist Dashboard</h2>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script>
+    
     // ----------------- SignalR Setup -----------------
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/accessHub")
@@ -17,8 +18,9 @@
     connection.start()
         .then(() => console.log("Connected to AccessHub"))
         .catch(err => console.error("SignalR connection error:", err));
-
-    // ----------------- Add Row Function -----------------
+         
+  
+      // ----------------- Add Row Function -----------------
     function addRequestRow(request) {
         const table = document.querySelector("table tbody");
         const row = table.insertRow();
@@ -26,14 +28,14 @@
         row.insertCell(0).innerText = request.doorId;
         row.insertCell(1).innerText = request.name;
         row.insertCell(2).innerText = statusText(request.status);
-        row.insertCell(3).innerText = new Date(request.requestTime).toLocaleTimeString();
+        row.insertCell(3).innerText = request.requestTime;
 
         const actionsCell = row.insertCell(4);
 
         if (request.status === 2) {
             actionsCell.innerHTML = `
-                <button class="btn btn-success" onclick="grantAccess(${request.id})">Grant</button>
-                <button class="btn btn-danger" onclick="rejectAccess(${request.id})">Reject</button>
+                <button  class="btn btn-success" asp-route-id="${request.id}" onclick="grantAccess(${request.id})">Grant</button>
+                <button class="btn btn-danger" asp-route-id="${request.id}" onclick="rejectAccess(${request.id})">Reject</button>
             `;
         } else {
             actionsCell.innerText = statusText(request.status);
@@ -78,6 +80,7 @@
         // or simply refresh the table if needed
         console.log(`Row ${id} updated to ${text}`);
     }
+
 </script>
 
 <table class="table">
@@ -97,16 +100,12 @@
                 <td>@r.DoorId</td>
                 <td>@r.Name</td>
                 <td>@(r.Status == 0 ? "Rejected" : r.Status == 1 ? "Granted" : "Pending")</td>
-                <td>@r.RequestTime.ToShortTimeString()</td>
+                <td>@r.RequestTime.ToString()</td>
                 <td>
                     @if (r.Status == 2)
                     {
-                        <button class="btn btn-success" onclick="grantAccess(@r.Id)">Grant</button>
-                        <button class="btn btn-danger" onclick="rejectAccess(@r.Id)">Reject</button>
-                    }
-                    else
-                    {
-                        <span>@(r.Status == 0 ? "Rejected" : r.Status == 1 ? "Granted" : "Pending")</span>
+                        <button  class="btn btn-success" asp-route-id="@r.Id" onclick="grantAccess(@r.Id)">Grant</button>
+                        <button class="btn btn-danger" asp-route-id="@r.Id" onclick="rejectAccess(@r.Id)">Reject</button>
                     }
                 </td>
             </tr>

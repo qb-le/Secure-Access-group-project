@@ -95,8 +95,9 @@ namespace Secure_Access.Controllers
                 );
 
                 await _receptionService.AddRequestAsync(request);
+
                 await _hubContext.Clients.Group("Receptionists")
-                        .SendAsync("ReceiveNotification", request);
+                        .SendAsync("ReceiveNotification", _receptionService.GetLatestRequest());
 
                 return Json(new
                 {

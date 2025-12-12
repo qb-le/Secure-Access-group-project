@@ -2,6 +2,7 @@
 using Logic.Classes;
 using Logic.Interface;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Secure_Access.Controllers
 {
@@ -25,8 +26,7 @@ namespace Secure_Access.Controllers
         [HttpPost]
         public async Task<IActionResult> GrantAccess(int id)
         {
-            // Retrieve request info
-            var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
+            var request = _receptionService.GetRequestById(id);
             if (request != null)
             {
 
@@ -36,7 +36,7 @@ namespace Secure_Access.Controllers
                 _receptionService.UpdateRequestStatus(id, 1);
             }
 
-            return RedirectToAction("ReceptionistDashboard");
+            return Redirect("ReceptionistDashboard");
         }
 
         [HttpPost]
@@ -50,7 +50,7 @@ namespace Secure_Access.Controllers
                 _receptionService.UpdateRequestStatus(id, 0);
             }
 
-            return RedirectToAction("ReceptionistDashboard");
+            return ReceptionistDashboard();
         }
     }
 }
