@@ -1,5 +1,7 @@
 ﻿using Logic.Classes;
+using Logic.Dto;
 using Logic.Interface;
+using Logic.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using QRCoder;
@@ -12,18 +14,20 @@ namespace Secure_Access.Controllers
 {
     public class QRController : Controller
     {
+        private readonly AuditLogService _auditLogService;
         private readonly QRTokenManager _qrManager;
         private readonly Email _email;
         private readonly IHubContext<AccessHub> _hubContext;
         private readonly IReceptionService _receptionService;
 
         // Inject the manager
-        public QRController(QRTokenManager qrManager, IHubContext<AccessHub> hubContext, IReceptionService receptionService)
+        public QRController(QRTokenManager qrManager, IHubContext<AccessHub> hubContext, IReceptionService receptionService, AuditLogService auditLogService)
         {
             _qrManager = qrManager;
             _email = new Email();
             _hubContext = hubContext;
             _receptionService = receptionService;
+            _auditLogService = auditLogService;
         }
 
         public IActionResult Scanner()
@@ -85,6 +89,12 @@ namespace Secure_Access.Controllers
             if (_qrManager.MarkAsScanned(token))
             {
                 var info = _qrManager.GetInfo(token);
+
+                _auditLogService.LogDoorOpenRequest(new DtoAuditLog
+                {
+                    UserId = 0, //not yet implemented sessions
+                    DoorId = info.DoorId,
+                });
 
                 var request = new Request(
                     info.Name,
