@@ -30,7 +30,7 @@ namespace Secure_Access.Controllers
         public async Task<IActionResult> GrantAccess(int id)
         {
             // Retrieve request info
-            var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
+            var request = _receptionService.GetRequestById(id);
             if (request != null)
             {
 
@@ -54,7 +54,7 @@ namespace Secure_Access.Controllers
         [HttpPost]
         public async Task<IActionResult> RejectAccess(int id)
         {
-            var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
+            var request = _receptionService.GetRequestById(id);
             if (request != null)
             {
                 await _hubContext.Clients.Group(request.Email)

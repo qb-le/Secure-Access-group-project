@@ -27,7 +27,7 @@ namespace DAL.repository
             {
                 conn.Open();
 
-                string query = "SELECT AuditLogId, LogTime, UserId, DoorId, AuditType, ExtraData FROM AuditLogs";
+                string query = "SELECT AuditLogId, LogTime, UserId, DoorId, AuditType, ExtraData FROM AuditLogs ORDER BY AuditLogId DESC";
 
                 using (var cmd = new SqlCommand(query, conn))
                 {

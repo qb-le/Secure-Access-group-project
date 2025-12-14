@@ -63,7 +63,7 @@ namespace DAL.repository
                 connection.Open();
                 var query = @"
             INSERT INTO Request (Name, Email, DoorId, RequestTime, [Status]) 
-            VALUES (@Name, @Email, @DoorId, @RequestTime, @Status)";
+            VALUES (@Name, @Email, @DoorId, GETDATE(), @Status)";
 
                 using (var command = new SqlCommand(query, connection))
                 {
@@ -96,6 +96,77 @@ namespace DAL.repository
                     command.ExecuteNonQuery();
                 }
             }
+        }
+        public Request GetRequestById(int id)
+        {
+            Request request;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string query = @"SELECT rq.Name, rq.Email, rq.DoorId, d.Name AS doorName, rq.RequestTime, rq.Status  
+                                FROM Request rq
+                                INNER JOIN Door d ON rq.DoorId = d.door_id
+                                WHERE Id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string name = reader.GetString(reader.GetOrdinal("Name"));
+                            string email = reader.GetString(reader.GetOrdinal("Email"));
+                            int doorId = reader.GetInt32(reader.GetOrdinal("DoorId"));
+                            string doorname = reader.GetString(reader.GetOrdinal("doorName"));
+                            DateTime requestTime = reader.GetDateTime(reader.GetOrdinal("RequestTime"));
+                            int status = reader.GetInt32(reader.GetOrdinal("Status"));
+
+                            request = new Request
+                            (
+                                name, email, doorId, doorname, requestTime, status
+                            );
+                            return request;
+                        }
+                    }
+                    return null;
+                }
+            }
+        }
+
+        public Request GetLatestRequest()
+        {
+            Request request;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string query = @"SELECT *  
+                                FROM Request rq
+                                INNER JOIN Door d ON rq.DoorId = d.door_id
+                                ORDER BY Id DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string name = reader.GetString(reader.GetOrdinal("Name"));
+                            string email = reader.GetString(reader.GetOrdinal("Email"));
+                            int doorId = reader.GetInt32(reader.GetOrdinal("DoorId"));
+                            DateTime requestTime = reader.GetDateTime(reader.GetOrdinal("RequestTime"));
+                            int status = reader.GetInt32(reader.GetOrdinal("Status"));
+
+                            request = new Request
+                            (
+                                name, email, doorId, requestTime, status
+                            );
+                            return request;
+                        }
+                    }
+                    return null;
+                }
+            }   
         }
     }
 

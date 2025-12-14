@@ -35,13 +35,6 @@ namespace Secure_Access.Controllers
             return View();
         }
 
-        public IActionResult QRLogin()
-        {
-            //var qrToken = _qrManager.GenerateToken();
-            //ViewBag.QRToken = qrToken;
-            return View();
-        }
-
         public IActionResult GenerateQRCode(string token)
         {
             var url = Url.Action("Scan", "QR", new { token }, Request.Scheme);
@@ -105,8 +98,9 @@ namespace Secure_Access.Controllers
                 );
 
                 await _receptionService.AddRequestAsync(request);
+
                 await _hubContext.Clients.Group("Receptionists")
-                        .SendAsync("ReceiveNotification", request);
+                        .SendAsync("ReceiveNotification", _receptionService.GetLatestRequest());
 
                 return Json(new
                 {
