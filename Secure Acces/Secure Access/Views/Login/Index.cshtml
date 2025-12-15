@@ -1,24 +1,66 @@
-﻿@{
-    ViewData["Title"] = "Login Page";
-}
+﻿@* @{ *@
+@*     ViewData["Title"] = "Login Page"; *@
+@* } *@
+@* *@
+@* <div class="container"> *@
+@*     <div class="d-flex justify-content-center mt-5"> *@
+@*         <form method="post" asp-controller="Door" asp-action="Index" class="p-5 border rounded bg-light shadow w-50"> *@
+@*             <h2 class="text-center mb-4">Login</h2> *@
+@*             <div class="mb-3"> *@
+@*                 <label class="form-label">Email:</label> *@
+@*                 <input type="text" name="email" class="form-control form-control-lg" required /> *@
+@*             </div> *@
+@*             <div class="mb-3"> *@
+@*                 <label class="form-label">Password:</label> *@
+@*                 <input type="password" name="password" class="form-control form-control-lg" required /> *@
+@*             </div> *@
+@*             <button type="submit" class="btn btn-primary w-100 btn-lg">Login</button> *@
+@*             <hr class="my-4"> *@
+@* *@
+@* *@
+@*         </form> *@
+@*     </div> *@
+@* </div> *@
 
-<div class="container">
-    <div class="d-flex justify-content-center mt-5">
-        <form method="post" asp-controller="Door" asp-action="Index" class="p-5 border rounded bg-light shadow w-50">
-            <h2 class="text-center mb-4">Login</h2>
-            <div class="mb-3">
-                <label class="form-label">Email:</label>
-                <input type="text" name="email" class="form-control form-control-lg" required />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Password:</label>
-                <input type="password" name="password" class="form-control form-control-lg" required />
-            </div>
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Login</button>
-            <hr class="my-4">
+@* @{ *@
+@*     ViewData["Title"] = "Login Page"; *@
+@* } *@
+@* *@
+@* <div class="container"> *@
+@*     <div class="d-flex justify-content-center mt-5"> *@
+@*         <form method="post" asp-controller="Door" asp-action="Index" class="p-5 border rounded bg-light shadow w-50"> *@
+@*             <h2 class="text-center mb-4">Login</h2> *@
+@*             <div class="mb-3"> *@
+@*                 <label class="form-label">Email:</label> *@
+@*                 <input type="text" name="email" class="form-control form-control-lg" required /> *@
+@*             </div> *@
+@*             <div class="mb-3"> *@
+@*                 <label class="form-label">Password:</label> *@
+@*                 <input type="password" name="password" class="form-control form-control-lg" required /> *@
+@*             </div> *@
+@*             <button type="submit" class="btn btn-primary w-100 btn-lg">Login</button> *@
+@*             <hr class="my-4"> *@
+@* *@
+@* *@
+@*         </form> *@
+@*     </div> *@
+@* </div> *@
 
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center" style="max-width: 400px; width: 100%;">
+        <h2 class="mb-4 fw-bold">Choose Role</h2>
 
-        </form>
+        <div class="d-grid gap-3">
+            <form asp-controller="Login" asp-action="Set" method="post">
+                <input type="hidden" name="role" value="Receptionist" />
+                <button type="submit" class="btn btn-primary w-100 role-button">Receptionist</button>
+            </form>
+
+            <form asp-controller="Login" asp-action="Set" method="post">
+                <input type="hidden" name="role" value="User" />
+                <button type="submit" class="btn btn-primary w-100 role-button">User</button>
+            </form>
+        </div>
     </div>
 </div>
 

@@ -18,6 +18,14 @@ namespace Secure_Access.Controllers
 
         public ActionResult ReceptionistDashboard()
         {
+            
+            var role = HttpContext.Session.GetString("Role");
+            
+            if (role != "Receptionist")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            
             var requests = _receptionService.GetAllRequests();
             return View(requests);
         }
@@ -25,12 +33,12 @@ namespace Secure_Access.Controllers
         [HttpPost]
         public async Task<IActionResult> GrantAccess(int id)
         {
-            // Retrieve request info
+          
             var request = _receptionService.GetAllRequests().FirstOrDefault(r => r.Id == id);
             if (request != null)
             {
 
-                request.Status = 1; // 1 = granted, 2 = pending, 3 = rejected
+                request.Status = 1; 
                 await _hubContext.Clients.Group(request.Email)
                     .SendAsync("ReceiveAccessNotification", "Access Granted! You may enter.");
                 _receptionService.UpdateRequestStatus(id, 1);

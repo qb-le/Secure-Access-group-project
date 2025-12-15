@@ -11,7 +11,19 @@ namespace Secure_Access.Controllers
         {
             _doorService = doorService;
         }
+        public ActionResult ChooseDoor()
+        {
+            
+            var role = HttpContext.Session.GetString("Role");
+            
+            if (role != "User")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            
+            return View("~/Views/Door/Index.cshtml");
 
+        }
         public IActionResult Index()
         {
             var groups = _doorService.GetAllDoorGroups();

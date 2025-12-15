@@ -12,15 +12,31 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddScoped<IAuditLogRepository>(provider  => new  AuditLogRepository(connectionString));
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
+builder.Services.AddScoped<IAuditLogRepository>(provider => new AuditLogRepository(connectionString));
 builder.Services.AddScoped<AuditLogService>();
+
 builder.Services.AddScoped<IUserRepository>(provider => new UserRepository(connectionString));
 builder.Services.AddScoped<UserService>();
+
 builder.Services.AddScoped<IDoorRepository>(provider => new DoorRepository(connectionString));
 builder.Services.AddScoped<IDoorService, DoorService>();
+
 builder.Services.AddSingleton<QRTokenManager>();
+
 builder.Services.AddScoped<IReceptionService, ReceptionService>();
 builder.Services.AddScoped<IReceptionistRepository>(provider => new ReceptionistRepository(connectionString));
+
 
 builder.Services.AddCors(options =>
 {
@@ -31,21 +47,12 @@ builder.Services.AddCors(options =>
 });
 
 
-
-
-
-// Add MVC services
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-app.MapControllers();
-app.MapHub<AccessHub>("/accessHub");
-app.UseCors("AllowAll");
 
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -57,12 +64,19 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+
+app.UseCors("AllowAll");
+
+
+app.UseSession();
+
 app.UseAuthorization();
 
-// Default route
+
+app.MapHub<AccessHub>("/accessHub");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=Index}/{id?}");
-
 
 app.Run();
