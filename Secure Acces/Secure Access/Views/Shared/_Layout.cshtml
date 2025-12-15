@@ -36,7 +36,9 @@
                         </ul>
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Index">Logout</a>
+                                <form asp-controller="Role" asp-action="Clear" method="post">
+                                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                                </form>
                             </li>
                         </ul>
                     </div>

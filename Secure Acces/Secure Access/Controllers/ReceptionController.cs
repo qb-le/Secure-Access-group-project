@@ -19,13 +19,20 @@ namespace Secure_Access.Controllers
             _hubContext = hubContext;
             _auditLogService = auditLogService;
         }
-
         public ActionResult ReceptionistDashboard()
         {
+    
+            var role = HttpContext.Session.GetString("Role");
+    
+            if (role != "Receptionist")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+    
             var requests = _receptionService.GetAllRequests();
             return View(requests);
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> GrantAccess(int id)
         {
