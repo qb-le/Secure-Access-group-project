@@ -1,4 +1,5 @@
-﻿using Logic.Service;
+﻿using Logic.Dto;
+using Logic.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Secure_Access.Controllers
@@ -28,8 +29,20 @@ namespace Secure_Access.Controllers
 
         public IActionResult Index()
         {
-            var logs = _auditLogService.GetAllLogs();
+            List<DtoAuditLog> logs = _auditLogService.GetAllLogsDto();
             return View(logs);
+        }
+
+        public IActionResult ByUser(int userId)
+        {
+            List<DtoAuditLog> logs = _auditLogService.GetLogsByUserDto(userId);
+            return View("Index", logs);
+        }
+
+        public IActionResult ByDoor(int doorId)
+        {
+            List<DtoAuditLog> logs = _auditLogService.GetLogsByDoorDto(doorId);
+            return View("Index", logs);
         }
     }
 }

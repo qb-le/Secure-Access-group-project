@@ -8,37 +8,62 @@ namespace Logic.Classes
 {
     public class AuditLog
     {
-        private int _id;
-        private Door _door;
-        private DateTime _date;
-        private int _userId;
+        public int Id { get; private set; }
+        public DateTime Date { get; private set; }
+        public int UserId { get; private set; }
+        public int? DoorId { get; private set; }
+        public AuditType AuditType { get; private set; }
+        public string? ExtraData { get; private set; }
 
-        public AuditLog(int id, Door door, DateTime date, int userId)
+        public AuditLog(int id, DateTime date, int userId, int? doorId, AuditType type, string? extraData)
         {
-            _id = id;
-            _door = door;
-            _date = date;
-            _userId = userId;
+            Id = id;
+            Date = date;
+            UserId = userId;
+            DoorId = doorId;
+            AuditType = type;
+            ExtraData = extraData;
         }
 
-        public int getId() 
-        { 
-            return _id; 
+        public static AuditLog CreateDoorOpenRequest(int userId, int doorId)
+        {
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorOpenRequest, null);
         }
 
-        public Door getDoor()
+        public static AuditLog CreateDoorAccessGranted(int userId, int doorId, string extraData)
         {
-            return _door;
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorAccessGranted, extraData);
         }
 
-        public DateTime getDate()
+        public static AuditLog CreateDoorAccessDenied(int userId, int doorId, string reason)
         {
-            return _date;
+            return new AuditLog(0, DateTime.Now, userId, doorId, AuditType.DoorAccessDenied,
+                $"{{ \"reason\": \"{reason}\" }}");
         }
 
-        public int getUserId()
+        public static AuditLog CreateQrCodeRequest(int userId, string qrValue)
         {
-            return _userId;
+            return new AuditLog(0, DateTime.Now, userId, null, AuditType.QrCodeRequest,
+                $"{{ \"qr\": \"{qrValue}\" }}");
+        }
+
+        public static AuditLog CreateLoginAttempt(int userId, bool success, string ip)
+        {
+            return new AuditLog(0, DateTime.Now, userId, null, AuditType.LoginAttempt,
+                $"{{ \"success\": {success.ToString().ToLower()}, \"ip\": \"{ip}\" }}");
+        }
+
+        public string GetDescription()
+        {
+            return AuditType switch
+            {
+                AuditType.DoorOpenRequest => $"User {UserId} requested door {DoorId}",
+                AuditType.DoorAccessGranted => $"User {UserId} was granted access to door {DoorId}",
+                AuditType.DoorAccessDenied => $"User {UserId} denied access to door {DoorId}",
+                AuditType.QrCodeRequest => $"User {UserId} requested QR code: {ExtraData}",
+                AuditType.LoginAttempt => $"User {UserId} login attempt: {ExtraData}",
+                _ => "Unknown event"
+            };
         }
     }
 }

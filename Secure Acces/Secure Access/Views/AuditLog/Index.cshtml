@@ -1,40 +1,29 @@
-﻿@model List<Logic.Classes.AuditLog>
-
-@{
-    ViewData["Title"] = "Audit Logbook";
+﻿@{
+    ViewData["Title"] = "Audit Logs";
+    ViewData["ShowReceptionistButton"] = true;
 }
+@model List<Logic.Dto.DtoAuditLog>
 
-<h2>@ViewData["Title"]</h2>
-
-<table class="table table-striped table-bordered mt-3">
-    <thead class="table-dark">
+<table class="table">
+    <thead>
         <tr>
-            <th>Log ID</th>
-            <th>Date / Time</th>
-            <th>User ID</th>
-            <th>Door Name</th>
-            <th>Door Group ID</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Door</th>
+            <th>Audit Type</th>
+            <th>Extra Data</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model == null || !Model.Any())
+        @foreach (var log in Model)
         {
             <tr>
-                <td colspan="5" class="text-center">No logs available.</td>
+                <td>@log.Date</td>
+                <td>@log.UserName</td>
+                <td>@log.DoorName</td>
+                <td>@log.AuditType</td>
+                <td>@log.ExtraData</td>
             </tr>
-        }
-        else
-        {
-            foreach (var log in Model)
-            {
-                <tr>
-                    <td>@log.getId()</td>
-                    <td>@log.getDate().ToString("yyyy-MM-dd HH:mm:ss")</td>
-                    <td>@log.getUserId()</td>
-                    <td>@log.getDoor().getName()</td>
-                    <td>@log.getDoor().getGroupId()</td>
-                </tr>
-            }
         }
     </tbody>
 </table>

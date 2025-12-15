@@ -29,4 +29,14 @@ public class ReceptionService : IReceptionService
     {
         _repository.UpdateRequestStatus(requestId, status);
     }
+
+    public Request GetRequestById(int id)
+    {
+        return _repository.GetRequestById(id);
+    }
+
+    public Request GetLatestRequest()
+    {
+        return _repository.GetLatestRequest();
+    }
 }

@@ -1,3 +1,8 @@
+@{
+    ViewData["Title"] = "Receptionist Dashboard";
+    ViewData["ShowLogsButton"] = true;
+}
+
 @model IEnumerable<Logic.Classes.Request>
 @Html.AntiForgeryToken()
 
@@ -10,74 +15,15 @@
         .withUrl("/accessHub")
         .build();
 
+    // When a notification arrives, refresh the page
     connection.on("ReceiveNotification", function (request) {
-        addRequestRow(request);
+        console.log("Notification received:", request);
+        location.reload(); // refreshes the entire page
     });
 
     connection.start()
         .then(() => console.log("Connected to AccessHub"))
         .catch(err => console.error("SignalR connection error:", err));
-
-    // ----------------- Add Row Function -----------------
-    function addRequestRow(request) {
-        const table = document.querySelector("table tbody");
-        const row = table.insertRow();
-
-        row.insertCell(0).innerText = request.doorId;
-        row.insertCell(1).innerText = request.name;
-        row.insertCell(2).innerText = statusText(request.status);
-        row.insertCell(3).innerText = new Date(request.requestTime).toLocaleTimeString();
-
-        const actionsCell = row.insertCell(4);
-
-        if (request.status === 2) {
-            actionsCell.innerHTML = `
-                <button class="btn btn-success" onclick="grantAccess(${request.id})">Grant</button>
-                <button class="btn btn-danger" onclick="rejectAccess(${request.id})">Reject</button>
-            `;
-        } else {
-            actionsCell.innerText = statusText(request.status);
-        }
-    }
-
-    // ----------------- Grant/Reject Functions -----------------
-    async function grantAccess(id) {
-        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-        const response = await fetch(`/Reception/GrantAccess?id=${id}`, {
-            method: 'POST',
-            headers: { 'RequestVerificationToken': token }
-        });
-        if (response.ok) {
-            updateRowStatus(id, "Granted");
-        }
-    }
-
-    async function rejectAccess(id) {
-        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-        const response = await fetch(`/Reception/RejectAccess?id=${id}`, {
-            method: 'POST',
-            headers: { 'RequestVerificationToken': token }
-        });
-        if (response.ok) {
-            updateRowStatus(id, "Rejected");
-        }
-    }
-
-    // ----------------- Helpers -----------------
-    function statusText(status) {
-        switch (status) {
-            case 0: return "Rejected";
-            case 1: return "Granted";
-            case 2: return "Pending";
-            default: return "Unknown";
-        }
-    }
-
-    function updateRowStatus(id, text) {
-        // find the row with matching hidden id if you add one,
-        // or simply refresh the table if needed
-        console.log(`Row ${id} updated to ${text}`);
-    }
 </script>
 
 <table class="table">
@@ -96,14 +42,21 @@
             <tr>
                 <td>@r.DoorId</td>
                 <td>@r.Name</td>
-                <td>@(r.Status == 0 ? "Rejected" : r.Status == 1 ? "Granted" : "Pending")</td>
-                <td>@r.RequestTime.ToShortTimeString()</td>
+                <td>@(r.Status == 0 || r.Status == 1 ? "Handled" : "Pending")</td>
+                <td>@r.RequestTime.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>
                     @if (r.Status == 2)
                     {
-                        <button class="btn btn-success" onclick="grantAccess(@r.Id)">Grant</button>
-                        <button class="btn btn-danger" onclick="rejectAccess(@r.Id)">Reject</button>
+                        <form asp-controller="Reception" asp-action="GrantAccess" asp-route-id="@r.Id" method="post">
+                            <button type="submit" class="btn btn-success">Grant</button>
+                        </form>
+
+                        <form asp-controller="Reception" asp-action="RejectAccess" asp-route-id="@r.Id" method="post">
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+
                     }
+
                     else
                     {
                         <span>@(r.Status == 0 ? "Rejected" : r.Status == 1 ? "Granted" : "Pending")</span>

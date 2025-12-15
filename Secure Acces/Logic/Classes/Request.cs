@@ -4,6 +4,8 @@ namespace Logic.Classes;
 
 public class Request
 {
+    private string doorname;
+
     public int Id { get; private set; }
     public string Name { get; private set; }
     public string Email { get; private set; }
@@ -29,6 +31,16 @@ public class Request
         Name = name;
         Email = email;
         DoorId = doorId;
+        RequestTime = requestTime;
+        Status = status;
+    }
+
+    public Request(string name, string email, int doorId, string doorname, DateTime requestTime, int status)
+    {
+        Name = name;
+        Email = email;
+        DoorId = doorId;
+        this.doorname = doorname;
         RequestTime = requestTime;
         Status = status;
     }

@@ -12,5 +12,7 @@ namespace Logic.Interface
         public List<Request> GetAllRequests();
         public void AddRequest(Request request);
         public void UpdateRequestStatus(int requestId, int status);
+        public Request GetRequestById(int id);
+        public Request GetLatestRequest();
     }
 }
